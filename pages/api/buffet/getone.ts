@@ -26,7 +26,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     b.regisDate, 
     b.isStudent, 
     bs.court_price,
-    (SELECT pc.playerId FROM pos_customers pc WHERE pc.customerID = b.id) AS playerId,
+    (
+        SELECT pc.playerId
+        FROM pos_customers pc
+        WHERE pc.customerID = b.id
+        LIMIT 1
+    ) AS playerId,
 
     -- เงินที่ยังไม่จ่าย
     (SELECT 
@@ -38,7 +43,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             END
         ) 
      FROM pos_sales ps 
-     WHERE ps.CustomerID = (
+     WHERE ps.CustomerID IN (
         SELECT pc.customerID 
         FROM pos_customers pc 
         WHERE pc.playerId = b.id AND pc.buffetStatus = '${buffetStatusEnum.BUFFET}'
