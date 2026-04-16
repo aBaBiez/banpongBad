@@ -17,90 +17,69 @@ export default async function getBuffetById(req: NextApiRequest, res: NextApiRes
     const connection = await pool.getConnection();
     try {
         const { id } = req.query;
-        if (!id) {
+        const buffetId = Number(Array.isArray(id) ? id[0] : id);
+        if (!Number.isFinite(buffetId) || buffetId <= 0) {
             return res.status(400).json({ message: 'Missing buffet ID' });
         }
 
-        const query = `
-        SELECT 
-            b.*, 
-            ROUND(bs.court_price, 2) AS court_price,
-            COALESCE(SUM(pos_sales.TotalAmount), 0) AS shoppingMoney,
-            (
-                COALESCE((
-                    SELECT (SUM(bsh.quantity * st.price) / 4 ) + bs.court_price
-                    FROM buffet_newbie_shuttlecocks bsh
-                    JOIN shuttlecock_types st ON bsh.shuttlecock_type_id = st.id
-                    WHERE bsh.buffet_id = b.id
-                ), bs.court_price)
-                +
-                COALESCE((
-                    SELECT SUM(
-                        CASE 
-                            WHEN ps.flag_delete = false THEN ps.TotalAmount
-                            ELSE 0
-                        END
-                    )
-                    FROM pos_sales ps
-                    WHERE ps.CustomerID = (
-                        SELECT pc.customerID
-                        FROM pos_customers pc
-                        WHERE pc.playerId = b.id AND pc.buffetStatus = '${buffetStatusEnum.BUFFET_NEWBIE}'
-                        LIMIT 1
-                    )
-                ), 0)
-            ) AS total_price,
-
-            COALESCE((
-                SELECT (SUM(bs.quantity * st.price) / 4)
-                FROM buffet_newbie_shuttlecocks bs
-                JOIN shuttlecock_types st ON bs.shuttlecock_type_id = st.id
-                WHERE bs.buffet_id = b.id
-            ), 0) AS shuttlecock_total_price,
-
-            (
-                SELECT JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        'shuttlecock_type_id', bs.shuttlecock_type_id,
-                        'shuttlecock_type', st.name,
-                        'quantity', bs.quantity
-                    )
-                )
-                FROM buffet_newbie_shuttlecocks bs
-                JOIN shuttlecock_types st ON bs.shuttlecock_type_id = st.id
-                WHERE bs.buffet_id = b.id
-            ) AS shuttlecock_details
-
-        FROM buffet_newbie b
-        JOIN buffet_setting_newbie bs ON bs.isStudent = b.isStudent
-        LEFT JOIN pos_sales ON pos_sales.CustomerID = (
-            SELECT pc.customerID
-            FROM pos_customers pc
-            WHERE pc.playerId = b.id AND pc.buffetStatus = '${buffetStatusEnum.BUFFET_NEWBIE}'
-            LIMIT 1
-        )
-        WHERE b.id = ?
-        GROUP BY b.id, bs.court_price, bs.shuttle_cock_price, b.shuttle_cock
-        `;
-
-        const [results] = await connection.query<RowDataPacket[]>(query, [id]);
-
-        if ((results).length === 0) {
+        const [buffetRows] = await connection.query<RowDataPacket[]>(
+            `SELECT b.*, ROUND(bs.court_price, 2) AS court_price
+             FROM buffet_newbie b
+             JOIN buffet_setting_newbie bs ON bs.isStudent = b.isStudent
+             WHERE b.id = ?
+             LIMIT 1`,
+            [buffetId]
+        );
+        if (!buffetRows.length) {
             return res.status(404).json({ message: 'buffet_newbie not found' });
         }
+        const buffet = buffetRows[0];
 
-        // ต้อง parse shuttlecock_details ถ้า database ส่งมาเป็น string
-        const result = results[0];
-        if (typeof result.shuttlecock_details === 'string') {
-            try {
-                result.shuttlecock_details = JSON.parse(result.shuttlecock_details);
-            } catch (err) {
-                console.error('Failed to parse shuttlecock_details:', err);
-                result.shuttlecock_details = [];
-            }
+        const [shuttlecockRows] = await connection.query<RowDataPacket[]>(
+            `SELECT bs.shuttlecock_type_id, st.name AS shuttlecock_type, st.price, bs.quantity
+             FROM buffet_newbie_shuttlecocks bs
+             JOIN shuttlecock_types st ON bs.shuttlecock_type_id = st.id
+             WHERE bs.buffet_id = ?`,
+            [buffetId]
+        );
+        const shuttlecock_details = shuttlecockRows.map((row) => ({
+            shuttlecock_type_id: row.shuttlecock_type_id,
+            shuttlecock_type: row.shuttlecock_type,
+            price: Number(row.price ?? 0),
+            quantity: Number(row.quantity ?? 0),
+        }));
+        const shuttlecock_total_price = shuttlecock_details.reduce((sum, row) => sum + (row.quantity * row.price) / 4, 0);
+
+        const [customerRows] = await connection.query<RowDataPacket[]>(
+            `SELECT customerID
+             FROM pos_customers
+             WHERE playerId = ? AND buffetStatus = ?`,
+            [buffetId, buffetStatusEnum.BUFFET_NEWBIE]
+        );
+        const customerIds = customerRows.map((row) => row.customerID);
+        let shoppingMoney = 0;
+        if (customerIds.length) {
+            const placeholders = customerIds.map(() => '?').join(', ');
+            const [moneyRows] = await connection.query<RowDataPacket[]>(
+                `SELECT COALESCE(SUM(CASE WHEN flag_delete = false THEN TotalAmount ELSE 0 END), 0) AS shoppingMoney
+                 FROM pos_sales
+                 WHERE customerID IN (${placeholders})`,
+                customerIds
+            );
+            shoppingMoney = Number(moneyRows[0]?.shoppingMoney ?? 0);
         }
 
-        res.json({ data: result });
+        const total_price = Number(buffet.court_price ?? 0) + shuttlecock_total_price + shoppingMoney;
+
+        res.json({
+            data: {
+                ...buffet,
+                shoppingMoney,
+                shuttlecock_total_price,
+                shuttlecock_details,
+                total_price,
+            },
+        });
         
     } catch (error) {
         console.error('Error fetching buffet_newbie by ID:', error);
