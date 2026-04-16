@@ -17,11 +17,14 @@ export default async function insertData(req: NextApiRequest, res: NextApiRespon
     const connection = await pool.getConnection();
     try {
         const { page = 1, limit = 15, search = '' } = req.query;
-        const offset = (Number(page) - 1) * Number(limit);
+        const searchValue = Array.isArray(search) ? search[0] : search;
+        const pageNumber = Number(Array.isArray(page) ? page[0] : page) || 1;
+        const limitNumber = Number(Array.isArray(limit) ? limit[0] : limit) || 15;
+        const offset = (pageNumber - 1) * limitNumber;
         
 
         const query = `
-        SELECT SQL_CALC_FOUND_ROWS
+        SELECT
             b.*
         FROM buffet_newbie b
         WHERE (b.nickname LIKE ? OR b.phone LIKE ? OR usedate LIKE ?)
@@ -29,10 +32,16 @@ export default async function insertData(req: NextApiRequest, res: NextApiRespon
         LIMIT ? OFFSET ?
         `;
 
-        const [results] = await connection.query(query, [`%${search}%`, `%${search}%`, `%${search}%`,Number(limit), offset]);
+        const likeSearch = `%${searchValue}%`;
+        const [results] = await connection.query(query, [likeSearch, likeSearch, likeSearch, limitNumber, offset]);
 
-        // ดึงจำนวนทั้งหมดเพื่อใช้กับ pagination
-        const [[{ total_items }]] = await connection.query<RowDataPacket[]>('SELECT FOUND_ROWS() as total_items');
+        const countQuery = `
+        SELECT COUNT(*) as total_items
+        FROM buffet_newbie b
+        WHERE (b.nickname LIKE ? OR b.phone LIKE ? OR usedate LIKE ?)
+        `;
+        const [countResults] = await connection.query<RowDataPacket[]>(countQuery, [likeSearch, likeSearch, likeSearch]);
+        const total_items = Number(countResults?.[0]?.total_items ?? 0);
         
         res.json({
             data: results,
