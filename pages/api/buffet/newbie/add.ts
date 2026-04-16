@@ -107,36 +107,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 const dateInBangkok = utcToZonedTime(new Date(), "Asia/Bangkok");
                 const today = format(dateInBangkok, 'dd MMMM yyyy')
                 try {
-                    const buffetUpdateQuery = `
-                        SELECT 
-                          bs.shuttle_cock_price, 
-                          bs.court_price, 
-                       (COALESCE((
-                            SELECT 
-                                ( SUM(bs_inner.quantity * st.price) / 4) + bs.court_price
-                            FROM buffet_newbie_shuttlecocks bs_inner
-                            JOIN shuttlecock_types st ON bs_inner.shuttlecock_type_id = st.id
-                            WHERE bs_inner.buffet_id = b.id
-                        ), bs.court_price)
-                    ) AS totalCourtPrice
-                        FROM 
-                          buffet_setting_newbie bs
-                        JOIN 
-                          buffet_newbie b ON b.id = ?
-                        WHERE 
-                          bs.isStudent = b.isStudent
-                        GROUP BY 
-                          bs.shuttle_cock_price, 
-                          bs.court_price
-                      `;
-
-                    const [buffetUpdateResult] = await connection.query<RowDataPacket[]>(buffetUpdateQuery, [id]);
-
-                    if (buffetUpdateResult.length === 0) {
-                        return res.status(400).json({ error: "No buffet_newbie settings found for the given buffet_newbie." });
+                    const [buffetRows] = await connection.query<RowDataPacket[]>(
+                        `SELECT isStudent FROM buffet_newbie WHERE id = ? LIMIT 1`,
+                        [id]
+                    );
+                    if (!buffetRows.length) {
+                        return res.status(404).json({ error: 'Buffet newbie not found' });
                     }
+                    const isStudent = buffetRows[0].isStudent;
 
-                    const totalShuttleCock = buffetUpdateResult[0].totalCourtPrice;
+                    const [settingRows] = await connection.query<RowDataPacket[]>(
+                        `SELECT court_price FROM buffet_setting_newbie WHERE isStudent = ? LIMIT 1`,
+                        [isStudent]
+                    );
+                    if (!settingRows.length) {
+                        return res.status(400).json({ error: 'No buffet_newbie settings found for the given buffet_newbie.' });
+                    }
+                    const courtPrice = Number(settingRows[0].court_price ?? 0);
+
+                    const [shuttlecockRows] = await connection.query<RowDataPacket[]>(
+                        `SELECT COALESCE(SUM(bs.quantity * st.price) / 4, 0) AS shuttlecock_total
+                         FROM buffet_newbie_shuttlecocks bs
+                         JOIN shuttlecock_types st ON bs.shuttlecock_type_id = st.id
+                         WHERE bs.buffet_id = ?`,
+                        [id]
+                    );
+                    const shuttlecockTotal = Number(shuttlecockRows[0]?.shuttlecock_total ?? 0);
+                    const totalShuttleCock = courtPrice + shuttlecockTotal;
 
                     const buffetUpdate = `
                         UPDATE buffet_newbie
@@ -151,17 +148,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                     await connection.query(buffetUpdate, [result.secure_url, totalShuttleCock, today, id]);
 
-                    await connection.query(`
-                            UPDATE pos_customers
-                            SET paymentStatus = '${customerPaymentStatusEnum.CHECKING}', 
-                            paymentSlip = ?, 
-                            courtPrice = ?,
-                            pay_by = ?
-                            WHERE CustomerID = (
-                              SELECT customerID 
-                              FROM (SELECT customerID FROM pos_customers WHERE playerId = ? AND buffetStatus = '${buffetStatusEnum.BUFFET_NEWBIE}') AS temp
-                            )
-                          `, [result.secure_url, totalShuttleCock, PayByEnum.TRANSFER, id]);
+                    const [customerRows] = await connection.query<RowDataPacket[]>(
+                        `SELECT customerID
+                         FROM pos_customers
+                         WHERE playerId = ? AND buffetStatus = ?
+                         ORDER BY customerID DESC
+                         LIMIT 1`,
+                        [id, buffetStatusEnum.BUFFET_NEWBIE]
+                    );
+                    if (customerRows.length) {
+                        await connection.query(
+                            `UPDATE pos_customers
+                             SET paymentStatus = ?, paymentSlip = ?, courtPrice = ?, pay_by = ?
+                             WHERE customerID = ?`,
+                            [
+                                customerPaymentStatusEnum.CHECKING,
+                                result.secure_url,
+                                totalShuttleCock,
+                                PayByEnum.TRANSFER,
+                                customerRows[0].customerID,
+                            ]
+                        );
+                    }
 
                     return res.status(200).json({ imageUrl: result.secure_url });
 
