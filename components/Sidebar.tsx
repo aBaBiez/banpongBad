@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               </ul>
             )}
           </li>
-          <li
+          {/* <li
             className={`${styles['menu-item']} ${router.pathname === '/Tournament' || router.pathname === '/Tournament/detail' ? styles.activeMenuItem : ''}`}
             onClick={() => setSelectedSubMenu3(!selectedSubMenu3)}
           >
@@ -70,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 <Link href="/Tournament/detail" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/Tournament/detail' ? styles.activeSubMenu : ''}`}><FaAngellist className='mx-1' /> <span>ตรวจสอบผู้สมัคร</span></li></Link>
               </ul>
             )}
-          </li>
+          </li> */}
           {/* <li
 
             className={`${styles['menu-item']} ${router.pathname === '/practice-court/booking/[id]' || router.pathname === '/practice-court/details/[id]' ? styles.activeMenuItem : ''}`}
@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               </ul>
             )}
           </li> */}
-          <li
+          {/* <li
             className={`${styles['menu-item']} ${router.pathname === '/guest-register' || router.pathname ===  '/guest-register/guest-register-info' ? styles.activeMenuItem : ''}`}
             onClick={() => setSelectedSubMenu5(!selectedSubMenu5)}
           >
@@ -100,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
 
               </ul>
             )}
-          </li>
+          </li> */}
         </ul>
       </div>
     </div>
