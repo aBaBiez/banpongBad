@@ -26,6 +26,7 @@ export const config = {
 type ParsedFields = Record<string, Array<string | undefined>>;
 type ParsedFile = { path?: string };
 type ParsedFiles = Record<string, ParsedFile[]>;
+const firstFieldValue = (fields: ParsedFields, key: string) => fields[key]?.[0] ?? '';
 
 const parseForm = (req: NextApiRequest) =>
     new Promise<{ fields: ParsedFields; files: ParsedFiles }>((resolve, reject) => {
@@ -47,11 +48,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
         const { fields, files } = await parseForm(req);
         if (req.method == 'POST') {
-            const nickname = fields.nickname;
-            const usedate = fields.usedate;
-            const phone = fields.phone;
-            const isStudent = fields.isStudent;
-            const skillLevel = fields.skillLevel;
+            const nickname = firstFieldValue(fields, 'nickname');
+            const usedate = firstFieldValue(fields, 'usedate');
+            const phone = firstFieldValue(fields, 'phone');
+            const isStudent = firstFieldValue(fields, 'isStudent');
+            const skillLevel = firstFieldValue(fields, 'skillLevel');
+            if (!nickname || !usedate || !phone || !skillLevel) {
+                return res.status(400).json({ error: 'Missing required fields' });
+            }
 
             const query = `INSERT INTO buffet (nickname, usedate, phone ,isStudent,skillLevel ) VALUES (?, ?, ? , ? , ?)`;
             const [results] = await connection.query<ResultSetHeader>(query, [nickname, usedate, phone, isStudent, skillLevel]);
@@ -85,7 +89,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         } else if (req.method == 'PUT') {
             const file = files.file?.[0];
-            const idRaw = fields.id?.[0];
+            const idRaw = firstFieldValue(fields, 'id');
             const id = Number(idRaw);
             if (!file?.path) {
                 return res.status(400).json({ error: 'Missing file in form-data field `file`' });
