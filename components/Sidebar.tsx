@@ -18,7 +18,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
   const router = useRouter();
   const [selectedSubMenu1, setSelectedSubMenu1] = useState(true);
-  const [selectedSubMenu2, setSelectedSubMenu2] = useState(true);
   const [selectedSubMenu3, setSelectedSubMenu3] = useState(true);
   const [selectedSubMenu4, setSelectedSubMenu4] = useState(true);
   const [selectedSubMenu5, setSelectedSubMenu5] = useState(true);
@@ -55,21 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 <Link href="/booking/buffet/info" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/booking/buffet/info' ? styles.activeSubMenu : ''}`} ><BiDetail className='mx-1' /> <span>ข้อมูลตีบุฟเฟ่ต์</span> </li></Link>
                 <Link href="/booking/buffet/queue" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/booking/buffet/queue' ? styles.activeSubMenu : ''}`} ><HiOutlineQueueList className='mx-1' /> <span>คิวตีบุฟเฟ่ต์</span> </li></Link>
 
-              </ul>
-            )}
-          </li>
-          <li
-            className={`${styles['menu-item']} ${router.pathname === '/booking/buffet/newbie' || router.pathname === '/booking/buffet/newbie/info' || router.pathname === '/booking/buffet/newbie/queue' ? styles.activeMenuItem : ''}`}
-            onClick={() => setSelectedSubMenu2(!selectedSubMenu2)}
-          >
-            {selectedSubMenu2 === true ? (
-              <a> <FaChevronCircleDown /> <span style={{ marginLeft: "10px" }}>บุฟเฟ่ต์สำหรับมือใหม่</span></a>
-            ) : <a> <FaChevronCircleRight /> <span style={{ marginLeft: "10px" }}>บุฟเฟ่ต์สำหรับมือใหม่</span></a>}
-            {(
-              <ul className={`${styles['sub-menu']}  ${selectedSubMenu2 ? styles.selectedSubMenu : ''}`} onClick={(e) => e.stopPropagation()}>
-                <Link href="/booking/buffet/newbie" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/booking/buffet/newbie' ? styles.activeSubMenu : ''}`} ><IoMdAdd className='mx-1' /> <span>จองตีบุฟเฟ่ต์</span> </li></Link>
-                <Link href="/booking/buffet/newbie/info" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/booking/buffet/newbie/info' ? styles.activeSubMenu : ''}`} ><BiDetail className='mx-1' /> <span>ข้อมูลตีบุฟเฟ่ต์</span> </li></Link>
-                <Link href="/booking/buffet/newbie/queue" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/booking/buffet/newbie/queue' ? styles.activeSubMenu : ''}`} ><HiOutlineQueueList className='mx-1' /> <span>คิวตีบุฟเฟ่ต์</span> </li></Link>
               </ul>
             )}
           </li>

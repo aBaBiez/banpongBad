@@ -29,20 +29,6 @@
     <priority>0.7</priority>
   </url>
 
-  <!-- บุฟเฟ่ต์สำหรับมือใหม่ -->
-  <url>
-    <loc>https://www.allstarsarena.com/booking/buffet/newbie</loc>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.allstarsarena.com/booking/buffet/newbie/info</loc>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.allstarsarena.com/booking/buffet/newbie/queue</loc>
-    <priority>0.7</priority>
-  </url>
-
   <!-- การสมัครแข่งขัน -->
   <url>
     <loc>https://www.allstarsarena.com/Tournament</loc>

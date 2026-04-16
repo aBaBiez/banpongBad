@@ -7,7 +7,7 @@ export type BuffetSettingsPageProps = {
   buffetUniversitySetting: IBuffet_setting;
 };
 
-type BuffetSettingsApiPath = '/api/buffet/get_setting' | '/api/buffet/newbie/get_setting';
+type BuffetSettingsApiPath = '/api/buffet/get_setting';
 
 /**
  * Loads the three buffet price tiers during getServerSideProps.

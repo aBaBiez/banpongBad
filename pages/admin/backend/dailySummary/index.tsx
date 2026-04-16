@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import Head from 'next/head';
 import { Modal } from 'react-bootstrap';
-import ListNotPayBuffetNewbie from './ListNotPayBuffetNewbie'
+import ListNotPayBuffet from './ListNotPayBuffet';
 
 interface SumData {
     pay_date: string;
@@ -12,11 +12,6 @@ interface SumData {
     sum_buffet_tranfer: number;
     sum_buffet_pos: number;
     sum_buffet_notPay: number;
-    sum_buffet_newbie: number;
-    sum_buffet_newbie_cash: number;
-    sum_buffet_newbie_tranfer: number;
-    sum_buffet_newbie_pos : number;
-    sum_buffet_newbie_notPay: number;
     total_sum: number;
 }
 
@@ -25,7 +20,6 @@ export default function DailySum() {
     const [sumdata, setSumdata] = useState<SumData[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [show, setShow] = useState(false);
-    const [showNewbie, setShowNewbie] = useState(false);
     const [selectedDate, setSelectedDate] = useState('');
 
     useEffect(() => {
@@ -61,37 +55,26 @@ export default function DailySum() {
                 <>
                     {/* Row 1 */}
                     <tr key={`${index}-cash`}>
-                        <td rowSpan={4}>{item.pay_date}</td>
-                        <td rowSpan={4}>{item.sum_reserve}</td>
-                        <td rowSpan={4}>{item.sum_tournament}</td>
+                        <td rowSpan={3}>{item.pay_date}</td>
+                        <td rowSpan={3}>{item.sum_reserve}</td>
+                        <td rowSpan={3}>{item.sum_tournament}</td>
 
                         <td>เงินสด</td>
                         <td className="table-primary">{item.sum_buffet_cash}</td>
-                        <td rowSpan={4} className="table-info">{item.sum_buffet}</td>
-
-                        <td>เงินสด</td>
-                        <td className="table-primary">{item.sum_buffet_newbie_cash}</td>
-                        <td rowSpan={4} className="table-info">{item.sum_buffet_newbie}</td>
-
-                        <td rowSpan={4}>{item.total_sum}</td>
+                        <td rowSpan={3} className="table-info">{item.sum_buffet}</td>
+                        <td rowSpan={3}>{item.total_sum}</td>
                     </tr>
 
                     {/* Row 2 */}
                     <tr key={`${index}-transfer`}>
                         <td>เงินโอน</td>
                         <td className="table-success">{item.sum_buffet_tranfer}</td>
-
-                        <td>เงินโอน</td>
-                        <td className="table-success">{item.sum_buffet_newbie_tranfer}</td>
                     </tr>
 
 
-                    <tr key={`${index}-transfer`}>
+                    <tr key={`${index}-pos`}>
                         <td>จ่ายผ่าน Pos</td>
                         <td className="table-success">{item.sum_buffet_pos}</td>
-
-                        <td>จ่ายผ่าน Pos</td>
-                        <td className="table-success">{item.sum_buffet_newbie_pos}</td>
                     </tr>
                     
                     {/* Row 3 */}
@@ -105,20 +88,7 @@ export default function DailySum() {
                                 {item.sum_buffet_notPay} คน
                             </button>
                         </td>
-
-                        <td>ยังไม่จ่าย</td>
-                        <td className="table-danger">
-                            <button
-                                onClick={() => { setShowNewbie(true); setSelectedDate(item.pay_date); }}
-                                style={{ border: 'none', background: 'none', textDecoration: 'underline', color: 'red' }}
-                            >
-                                {item.sum_buffet_newbie_notPay} คน
-                            </button>
-                        </td>
                     </tr>
-
-                    {/* Row 4 */}
-                    <tr key={`${index}-spacer`}></tr>
                 </>
             );
         });
@@ -128,7 +98,7 @@ export default function DailySum() {
         <>
             {Array.from({ length: 5 }).map((_, index) => (
                 <tr key={index}>
-                    {Array.from({ length: 10 }).map((_, colIndex) => (
+                    {Array.from({ length: 6 }).map((_, colIndex) => (
                         <td key={colIndex}>
                             <div className="skeleton-line" style={{ height: '80px' }}></div>
                         </td>
@@ -171,8 +141,6 @@ export default function DailySum() {
                             <th>ค่าสมัครแข่งขัน</th>
                             <th colSpan={2}>ตีบุฟเฟต์</th>
                             <th>รวมบุฟเฟต์</th>
-                            <th colSpan={2}>ตีบุฟเฟต์มือใหม่</th>
-                            <th>รวมมือใหม่</th>
                             <th>รวมทั้งหมด</th>
                         </tr>
                     </thead>
@@ -189,17 +157,7 @@ export default function DailySum() {
                     <Modal.Title>รายละเอียดบุฟเฟต์ (ปกติ)</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <ListNotPayBuffetNewbie date={selectedDate} mode="normal" />
-                </Modal.Body>
-            </Modal>
-
-            {/* Modal มือใหม่ */}
-            <Modal show={showNewbie} onHide={() => { setShowNewbie(false); fetchData(selectedValue) }} centered fullscreen>
-                <Modal.Header closeButton>
-                    <Modal.Title>รายละเอียดบุฟเฟต์มือใหม่</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <ListNotPayBuffetNewbie date={selectedDate} mode="newbie" />
+                    <ListNotPayBuffet date={selectedDate} />
                 </Modal.Body>
             </Modal>
         </>

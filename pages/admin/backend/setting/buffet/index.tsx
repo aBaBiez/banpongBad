@@ -23,19 +23,7 @@ function BuffetSetting() {
         university: null
     });
 
-    // State for newbie buffet settings
-    const [newbieSettings, setNewbieSettings] = useState<BuffetSettingGroup>({
-        regular: null,
-        student: null,
-        university: null
-    });
-
     const [editingStandardSetting, setEditingStandardSetting] = useState<{
-        data: BuffetSetting | null;
-        type: 'regular' | 'student' | 'university';
-    } | null>(null);
-
-    const [editingNewbieSetting, setEditingNewbieSetting] = useState<{
         data: BuffetSetting | null;
         type: 'regular' | 'student' | 'university';
     } | null>(null);
@@ -46,7 +34,6 @@ function BuffetSetting() {
     // Fetch all data on component mount
     useEffect(() => {
         getBuffetSettings();
-        getBuffetSettingsNewbie();
         getShuttleCockTypes();
     }, []);
 
@@ -83,46 +70,21 @@ function BuffetSetting() {
         }
     };
 
-    // Fetch newbie buffet settings
-    const getBuffetSettingsNewbie = async () => {
-        try {
-            const response = await fetch('/api/admin/buffet_setting_newbie');
-            if (response.ok) {
-                const data = await response.json();
-                setNewbieSettings({
-                    regular: data[0],
-                    student: data[1],
-                    university: data[2]
-                });
-            } else {
-                console.error('Failed to fetch newbie buffet settings');
-            }
-        } catch (error) {
-            console.error('Error fetching newbie buffet settings:', error);
-        }
-    };
-
     // Update buffet settings
-    const updateBuffetSetting = async (isNewbie: boolean) => {
-        const editingSettings = isNewbie ? editingNewbieSetting : editingStandardSetting;
+    const updateBuffetSetting = async () => {
+        const editingSettings = editingStandardSetting;
         if (!editingSettings) return;
 
         try {
-            const endpoint = isNewbie ? '/api/admin/buffet_setting_newbie' : '/api/admin/buffet_setting';
-            const response = await fetch(endpoint, {
+            const response = await fetch('/api/admin/buffet_setting', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(editingSettings.data),
             });
 
             if (response.ok) {
-                if (isNewbie) {
-                    getBuffetSettingsNewbie();
-                } else {
-                    getBuffetSettings();
-                }
-                const setEditing = isNewbie ? setEditingNewbieSetting : setEditingStandardSetting;
-                setEditing(null);
+                getBuffetSettings();
+                setEditingStandardSetting(null);
             } else {
                 console.error('Failed to update buffet settings');
             }
@@ -155,11 +117,10 @@ function BuffetSetting() {
     };
 
     // Handle input change for buffet settings
-    const handleSettingChange = (field: keyof BuffetSetting, value: number, isNewbie: boolean) => {
-        const editingSettings = isNewbie ? editingNewbieSetting : editingStandardSetting;
+    const handleSettingChange = (field: keyof BuffetSetting, value: number) => {
+        const editingSettings = editingStandardSetting;
         if (!editingSettings) return;
-        const setEditingSettings = isNewbie ? setEditingNewbieSetting : setEditingStandardSetting;
-        setEditingSettings({
+        setEditingStandardSetting({
             ...editingSettings,
             data: {
                 ...editingSettings.data!,
@@ -176,9 +137,9 @@ function BuffetSetting() {
     };
 
     // Render buffet settings table
-    const renderBuffetTable = (isNewbie: boolean) => {
-        const currentSettings = isNewbie ? newbieSettings : settings;
-        const title = isNewbie ? "ตั้งค่าตีบุฟเฟ่ต์ (มือใหม่)" : "ตั้งค่าตีบุฟเฟ่ต์";
+    const renderBuffetTable = () => {
+        const currentSettings = settings;
+        const title = 'ตั้งค่าตีบุฟเฟ่ต์';
 
         return (
             <>
@@ -194,9 +155,9 @@ function BuffetSetting() {
                         </tr>
                     </thead>
                     <tbody>
-                        {renderSettingRow('บุคคลทั่วไป', currentSettings.regular, 'regular', isNewbie)}
-                        {renderSettingRow('นักเรียน', currentSettings.student, 'student', isNewbie)}
-                        {renderSettingRow('มหาวิทยาลัย', currentSettings.university, 'university', isNewbie)}
+                        {renderSettingRow('บุคคลทั่วไป', currentSettings.regular, 'regular')}
+                        {renderSettingRow('นักเรียน', currentSettings.student, 'student')}
+                        {renderSettingRow('มหาวิทยาลัย', currentSettings.university, 'university')}
                     </tbody>
                 </Table>
             </>
@@ -204,11 +165,11 @@ function BuffetSetting() {
     };
 
     // Render a single row in buffet settings table
-    const renderSettingRow = (label: string, setting: BuffetSetting | null, type: 'regular' | 'student' | 'university', isNewbie: boolean) => {
+    const renderSettingRow = (label: string, setting: BuffetSetting | null, type: 'regular' | 'student' | 'university') => {
         if (!setting) return null;
-        const editingSettings = isNewbie ? editingNewbieSetting : editingStandardSetting;
+        const editingSettings = editingStandardSetting;
         const isEditing = editingSettings?.data?.id === setting.id;
-        const setEditingSettings = isNewbie ? setEditingNewbieSetting : setEditingStandardSetting;
+        const setEditingSettings = setEditingStandardSetting;
         return (
             <tr>
                 <td>{label}</td>
@@ -218,7 +179,7 @@ function BuffetSetting() {
                             type="number"
                             className="form-control text-center"
                             value={editingSettings?.data?.court_price}
-                            onChange={(e) => handleSettingChange('court_price', +e.target.value, isNewbie)}
+                            onChange={(e) => handleSettingChange('court_price', +e.target.value)}
                         />
                     ) : (
                         setting.court_price
@@ -230,7 +191,7 @@ function BuffetSetting() {
                             <Button
                                 variant="success"
                                 size="sm"
-                                onClick={() => updateBuffetSetting(isNewbie)}
+                                onClick={updateBuffetSetting}
                             >
                                 บันทึก
                             </Button>
@@ -385,8 +346,7 @@ function BuffetSetting() {
             </Head>
             <Container className="py-5">
                 <h2 className="text-center mb-4">การตั้งค่าราคา</h2>
-                {renderBuffetTable(false)}
-                {renderBuffetTable(true)}
+                {renderBuffetTable()}
                 {renderShuttlecockTable()}
             </Container>
         </>

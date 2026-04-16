@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
           <Link href="/admin/backend/dailySummary" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/admin/backend/dailySummary' ? styles.activeMenuItem : ''}`}> <div><FaRegMoneyBillAlt /> <span> สรุปยอดรายวัน</span></div> </li></Link>
 
           <li
-            className={`${styles['menu-item']} ${(router.pathname.startsWith('/admin/backend/booking/') && !router.pathname.startsWith('/admin/backend/booking/buffet/')) ? styles.activeMenuItem : ''}`}
+            className={`${styles['menu-item']} ${router.pathname.startsWith('/admin/backend/booking/') ? styles.activeMenuItem : ''}`}
             onClick={() => setSelectedSubMenu1(!selectedSubMenu1)}
           >
             {selectedSubMenu1 === true ? (
@@ -54,21 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
             )}
           </li>
 
-          <li
-            className={`${styles['menu-item']} ${router.pathname.startsWith('/admin/backend/booking/buffet/') ? styles.activeMenuItem : ''}`}
-            onClick={() => setSelectedSubMenu2(!selectedSubMenu2)}
-          >
-            {selectedSubMenu2 === true ? (
-              <a>  <FaChevronCircleDown /> <span style={{ marginLeft: "10px" }}>บุฟเฟ่ต์สำหรับมือใหม่</span> </a>
-            ) : <a><FaChevronCircleRight /> <span style={{ marginLeft: "10px" }}></span>บุฟเฟ่ต์สำหรับมือใหม่</a>}
-            {(
-              <ul className={`${styles['sub-menu']}  ${selectedSubMenu2 ? styles.selectedSubMenu : ''}`} onClick={(e) => e.stopPropagation()}>
-                <Link href="/admin/backend/booking/buffet/newbie/reserved" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/admin/backend/booking/buffet/newbie/reserved' ? styles.activeSubMenu : ''}`} ><div><FaSearch /> <span>บุฟเฟต์/สลิป</span></div></li></Link>
-                <Link href="/admin/backend/booking/buffet/newbie" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/admin/backend/booking/buffet/newbie' ? styles.activeSubMenu : ''}`} ><div><FaCalendarAlt /> <span>คิวบุฟเฟ่ต์/ค่าลูก</span></div></li></Link>
-
-              </ul>
-            )}
-          </li>
           <li
             className={`${styles['menu-item']} ${router.pathname.startsWith('/admin/backend/tournament/') ? styles.activeMenuItem : ''}`}
             onClick={() => setSelectedSubMenu2(!selectedSubMenu2)}

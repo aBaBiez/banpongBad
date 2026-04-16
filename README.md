@@ -13,8 +13,7 @@ This document explains the project structure, setup, and where to find important
   - Buffet:
     - Booking page: [`pages/booking/buffet/index.tsx`](pages/booking/buffet/index.tsx)
     - Buffet info: [`pages/booking/buffet/info.tsx`](pages/booking/buffet/info.tsx)
-    - Newbie variant: [`pages/booking/buffet/newbie/index.tsx`](pages/booking/buffet/newbie/index.tsx) and [`pages/booking/buffet/newbie/info.tsx`](pages/booking/buffet/newbie/info.tsx)
-    - Queue UI: [`pages/booking/buffet/newbie/queue/index.tsx`](pages/booking/buffet/newbie/queue/index.tsx)
+    - Queue UI: [`pages/booking/buffet/queue/index.tsx`](pages/booking/buffet/queue/index.tsx)
     - Admin buffet queue: [`pages/admin/backend/booking/buffet/index.tsx`](pages/admin/backend/booking/buffet/index.tsx) — component: [`Buffets`](pages/admin/backend/booking/buffet/index.tsx)
 - Admin UI:
   - Admin home: [`pages/admin/backend/index.tsx`](pages/admin/backend/index.tsx)
@@ -28,10 +27,10 @@ This document explains the project structure, setup, and where to find important
   - Abbreviated select: [`components/admin/AbbreviatedSelect.tsx`](components/admin/AbbreviatedSelect.tsx)
 - API endpoints:
   - Example: Admin setting (protected): [`pages/api/admin/setting/hand_level.ts`](pages/api/admin/setting/hand_level.ts)
-  - Buffet newbie APIs: get/regis/getone: [`pages/api/buffet/newbie/get.ts`](pages/api/buffet/newbie/get.ts), [`pages/api/buffet/newbie/getone.ts`](pages/api/buffet/newbie/getone.ts), [`pages/api/buffet/newbie/getRegis.ts`](pages/api/buffet/newbie/getRegis.ts)
+  - Buffet APIs: get/regis/getone: [`pages/api/buffet/get.ts`](pages/api/buffet/get.ts), [`pages/api/buffet/getone.ts`](pages/api/buffet/getone.ts), [`pages/api/buffet/getRegis.ts`](pages/api/buffet/getRegis.ts)
   - Guest registration: [`pages/api/guest-register/index.ts`](pages/api/guest-register/index.ts)
   - Edit rules (protected): [`pages/api/admin/editRules/index.ts`](pages/api/admin/editRules/index.ts)
-  - Add/reduce shuttlecock usage: [`pages/api/admin/buffet/newbie/add_reduce/index.ts`](pages/api/admin/buffet/newbie/add_reduce/index.ts)
+  - Add/reduce shuttlecock usage: [`pages/api/admin/buffet/add_reduce/index.ts`](pages/api/admin/buffet/add_reduce/index.ts)
 - Database pool: [`db/db.ts`](db/db.ts) — MySQL connection pool used throughout the API (via `mysql2`)
 - Styles:
   - CSS module examples: [`pages/guest-register/guest-register.module.css`](pages/guest-register/guest-register.module.css), [`styles/admin/buffet.module.css`](styles/admin/buffet.module.css)
@@ -115,28 +114,28 @@ Notes:
 - Database pool is in [`db/db.ts`](db/db.ts)
 - Many API endpoints use prepared SQL and MySQL parameterization.
 - Some responses store JSON in DB columns (e.g., `shuttlecock_details`) — ensure you JSON.parse safely:
-  - Example handling: [`pages/api/buffet/newbie/getone.ts`](pages/api/buffet/newbie/getone.ts) (parsing string to JSON)
+  - Example handling: [`pages/api/buffet/getone.ts`](pages/api/buffet/getone.ts) (parsing string to JSON)
 
 ---
 
 ## UI & Behavior notes
 - Drag and drop: buffet queue & drag logic implemented using `react-beautiful-dnd`:
   - Admin queue: [`pages/admin/backend/booking/buffet/index.tsx`](pages/admin/backend/booking/buffet/index.tsx) — `Buffets()` component
-  - Newbie queue: [`pages/booking/buffet/newbie/queue/index.tsx`](pages/booking/buffet/newbie/queue/index.tsx)
+- Buffet queue: [`pages/booking/buffet/queue/index.tsx`](pages/booking/buffet/queue/index.tsx)
 - SweetAlert2 is used for confirmations and loading prompts across multiple pages:
   - Example: [`pages/booking/buffet/index.tsx`](pages/booking/buffet/index.tsx)
 - File uploads and images:
-  - Upload UI & preview in: [`pages/booking/buffet/info.tsx`](pages/booking/buffet/info.tsx), [`pages/booking/buffet/newbie/info.tsx`](pages/booking/buffet/newbie/info.tsx)
+  - Upload UI & preview in: [`pages/booking/buffet/info.tsx`](pages/booking/buffet/info.tsx)
   - Cloudinary + server side upload logic appears in APIs; search for `cloudinary` usage.
 
 ---
 
 ## Common tasks & examples
 - Fetch shuttlecock types:
-  - Called from UI: `getShuttleCockTypes` in [`pages/booking/buffet/index.tsx`](pages/booking/buffet/index.tsx) and [`pages/booking/buffet/newbie/index.tsx`](pages/booking/buffet/newbie/index.tsx)
+  - Called from UI: `getShuttleCockTypes` in [`pages/booking/buffet/index.tsx`](pages/booking/buffet/index.tsx)
   - Endpoint: `/api/buffet/get_shuttlecock_types`
 - Update counts (debounced) in the admin UI:
-  - Pattern using `debounce` and `fetch` in [`pages/admin/backend/booking/buffet/newbie/index.tsx`](pages/admin/backend/booking/buffet/newbie/index.tsx)
+  - Pattern using `debounce` and `fetch` in [`pages/admin/backend/booking/buffet/index.tsx`](pages/admin/backend/booking/buffet/index.tsx)
 
 ---
 
@@ -165,7 +164,7 @@ Notes:
 - Node version mismatch — `package.json` requires Node 22.x.
 - DB connection errors likely due to `.env` misconfiguration — check `db/db.ts`.
 - File upload and Cloudinary: ensure credentials in `.env` and correct form data.
-- If `shuttlecock_details` show as a string, ensure it’s JSON parsed safely (see [`pages/api/buffet/newbie/getone.ts`](pages/api/buffet/newbie/getone.ts)).
+- If `shuttlecock_details` show as a string, ensure it’s JSON parsed safely (see [`pages/api/buffet/getone.ts`](pages/api/buffet/getone.ts)).
 
 ---
 

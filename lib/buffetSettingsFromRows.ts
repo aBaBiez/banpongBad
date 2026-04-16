@@ -7,7 +7,7 @@ function rowForTier(rows: BuffetSettingRow[], tier: number): BuffetSettingRow | 
 }
 
 /**
- * Maps `SELECT * FROM buffet_setting` (or `_newbie`) rows to the three UI tiers.
+ * Maps `SELECT * FROM buffet_setting` rows to the three UI tiers.
  * Expects one row per isStudent value 0 (general), 1 (student), 2 (university).
  */
 export function buffetSettingsFromRows(rows: unknown): {
