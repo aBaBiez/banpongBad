@@ -5,7 +5,7 @@ export enum SkillLevelEnum {
   NPlus = "N+",
   S = "S",
   SPlus = "S+",
-  P = "P",
+  PMinus = "P-",
   // P = "P",
   // X = "X",
   // Unknown = "-"
@@ -18,7 +18,7 @@ export const SkillLevelColor: Record<SkillLevelEnum, string> = {
   [SkillLevelEnum.NPlus]: "rgb(0, 128, 0)",     // green
   [SkillLevelEnum.S]: "rgb(255, 255, 0)",       // yellow
   [SkillLevelEnum.SPlus]: "rgb(255, 166, 0)",   // orange
-  [SkillLevelEnum.P]: "rgb(255, 0, 0)"     // red
+  [SkillLevelEnum.PMinus]: "rgb(255, 0, 0)"     // red
   // [SkillLevelEnum.P]: "rgba(139, 0, 0, 0.5)",         // dark red
   // [SkillLevelEnum.X]: "rgba(0, 0, 0, 0.5)",           // black
   // [SkillLevelEnum.Unknown]: "rgba(128, 128, 128, 0.5)"// gray
