@@ -1,14 +1,21 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import pool from '@/db/db';
-import { format, utcToZonedTime } from 'date-fns-tz';
 import { buffetStatusEnum } from '@/enum/buffetStatusEnum';
 import { RowDataPacket } from 'mysql2';
 
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+    if (req.method !== 'GET') {
+        return res.status(405).json({ message: 'Method not allowed' });
+    }
+
     const connection = await pool.getConnection()
     try {
         const { id } = req.query
+        const buffetId = Number(Array.isArray(id) ? id[0] : id);
+        if (!Number.isFinite(buffetId) || buffetId <= 0) {
+            return res.status(400).json({ error: 'Invalid id' });
+        }
         const query = `SELECT 
     b.id, 
     b.nickname, 
@@ -89,7 +96,10 @@ WHERE
         ;
 
         // Execute the SQL query to fetch time slots
-        const [results] = await connection.query<RowDataPacket[]>(query, [id]);
+        const [results] = await connection.query<RowDataPacket[]>(query, [buffetId]);
+        if (!results.length) {
+            return res.status(404).json({ error: 'Buffet not found' });
+        }
 
         // ต้อง parse shuttlecock_details ถ้า database ส่งมาเป็น string
         const result = results[0];
