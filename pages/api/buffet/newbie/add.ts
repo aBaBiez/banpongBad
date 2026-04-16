@@ -23,15 +23,19 @@ export const config = {
     },
 };
 
+type ParsedFields = Record<string, Array<string | undefined>>;
+type ParsedFile = { path?: string };
+type ParsedFiles = Record<string, ParsedFile[]>;
+
 const parseForm = (req: NextApiRequest) =>
-    new Promise<{ fields: multiparty.Fields; files: multiparty.Files }>((resolve, reject) => {
+    new Promise<{ fields: ParsedFields; files: ParsedFiles }>((resolve, reject) => {
         const form = new multiparty.Form();
         form.parse(req, (err, fields, files) => {
             if (err) {
                 reject(err);
                 return;
             }
-            resolve({ fields, files });
+            resolve({ fields: fields as ParsedFields, files: files as ParsedFiles });
         });
     });
 
