@@ -71,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
               </ul>
             )}
           </li>
-          <li
+          {/* <li
 
             className={`${styles['menu-item']} ${router.pathname === '/practice-court/booking/[id]' || router.pathname === '/practice-court/details/[id]' ? styles.activeMenuItem : ''}`}
             onClick={() => { setSelectedSubMenu4(!selectedSubMenu4); }}
@@ -85,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar }) => {
                 <Link href="/practice-court/details/0" className={styles.link} ><li onClick={handleMenuItemClick} className={`${styles['sub-menu-item']} ${router.pathname === '/practice-court/details/[id]' ? styles.activeSubMenu : ''}`} ><FaCalendarAlt className='mx-1' /> <span>ข้อมูลการจอง</span> </li></Link>
               </ul>
             )}
-          </li>
+          </li> */}
           <li
             className={`${styles['menu-item']} ${router.pathname === '/guest-register' || router.pathname ===  '/guest-register/guest-register-info' ? styles.activeMenuItem : ''}`}
             onClick={() => setSelectedSubMenu5(!selectedSubMenu5)}
