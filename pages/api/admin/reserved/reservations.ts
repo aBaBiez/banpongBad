@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import pool from '@/db/db';
 import { getToken } from 'next-auth/jwt';
+import { sanitizeReservationPriceForMysql } from '@/lib/reservationPrice';
+import { normalizeUsedateForMysql } from '@/lib/reserveUsedate';
 
 
 
@@ -16,6 +18,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
 
         const { name, phone, court_id, time_slot_id, startvalue, endvalue, usedate, price  } = req.body;
+        const usedateMysql = normalizeUsedateForMysql(usedate);
+        if (!usedateMysql) {
+          res.status(400).json({ message: 'Invalid usedate' });
+          return;
+        }
+        const priceMysql = sanitizeReservationPriceForMysql(price);
+        if (!priceMysql) {
+          res.status(400).json({ message: 'Invalid price' });
+          return;
+        }
         const insertQuery = `
        INSERT INTO reserve (name, phone, court_id, time_slot_id, start_time, end_time, usedate, price , status )
        SELECT ?, ?, ?, ?, ?, ?, ?, ? , 2
@@ -27,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     )
   )
 `;
-        const params = [name, phone, court_id, time_slot_id, startvalue, endvalue, usedate, price, court_id, usedate, startvalue, endvalue
+        const params = [name, phone, court_id, time_slot_id, startvalue, endvalue, usedateMysql, priceMysql, court_id, usedateMysql, startvalue, endvalue
         ];
         const [result] = await connection.query(insertQuery, params);
 
