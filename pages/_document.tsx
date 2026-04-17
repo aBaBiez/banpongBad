@@ -5,21 +5,21 @@ export default function Document() {
     <Html lang="th">
       <Head>
         {/* Title & Meta Description */}
-        <meta name="description" content="จองสนามแบดมินตันที่ดีที่สุดในเชียงราย สมัครแข่งแบด ตีแบดบุฟเฟ่ต์ ครบจบในที่เดียว All Stars Arena เชียงราย" />
+        <meta name="description" content="ยินดีตอนรับทุกคนจ้าา" />
         <meta name="keywords" content="จองสนามแบดมินตัน เชียงราย, สนามแบด เชียงราย, ออลสตา เชียงราย, ออลสตาแบดมินตัน, สนามแบดมินตัน เชียงราย, ตีแบด เชียงราย, สมัครแข่งแบด เชียงราย, บุฟเฟ่ต์แบดมินตัน เชียงราย, All Stars Arena, allstars arena เชียงราย" />
 
         {/* Open Graph Meta Tags */}
-        <meta property="og:title" content="จองสนามแบดมินตัน เชียงราย | All Stars Arena" />
-        <meta property="og:description" content="จองสนามแบดมินตันที่ดีที่สุดในเชียงราย สมัครแข่งแบด ตีแบดบุฟเฟ่ต์ ครบจบในที่เดียว All Stars Arena เชียงราย" />
-        <meta property="og:image" content="https://www.allstarsarena.com/logo.jpg" />
+        <meta property="og:title" content="ก๊วนแบดมินตันนิวเคลียร์ Nuclear Badminton" />
+        <meta property="og:description" content="ยินดีตอนรับทุกคนจ้าาา" />
+        <meta property="og:image" content="https://res.cloudinary.com/dgzxkk45s/image/upload/v1776445303/J_PT_ssdphz.jpg" />
         <meta property="og:url" content="https://www.allstarsarena.com" />
         <meta property="og:type" content="website" />
 
         {/* Twitter Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="จองสนามแบดมินตัน เชียงราย | All Stars Arena" />
-        <meta name="twitter:description" content="จองสนามแบดมินตันที่ดีที่สุดในเชียงราย สมัครแข่งแบด ตีแบดบุฟเฟ่ต์ ครบจบในที่เดียว All Stars Arena เชียงราย" />
-        <meta name="twitter:image" content="https://www.allstarsarena.com/logo.jpg" />
+        <meta name="twitter:title" content="ก๊วนแบดมินตันนิวเคลียร์ Nuclear Badminton" />
+        <meta name="twitter:description" content="ยินดีตอนรับทุกคนจ้าาาา" />
+        <meta name="twitter:image" content="https://res.cloudinary.com/dgzxkk45s/image/upload/v1776445303/J_PT_ssdphz.jpg" />
         <meta name="twitter:url" content="https://www.allstarsarena.com" />
         
         {/* Favicon */}
